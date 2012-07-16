@@ -1,0 +1,36 @@
+{
+  "WinstonMongoDb": {
+    "level": "warn",
+    "silent": false,
+    "db": "winston",
+    "collection": "log",
+    "safe": true,
+    "host": "localhost",
+    "port": 27017,
+    "errorTimeout": 10000,
+    "timeoout": 10000,
+    "keepAlive": 1000
+  },
+    "WinstonEmail": {
+    "to": "to@gmail.com", 
+    "from": "from@gmail.com",
+    "host": "smtp.gmail.com",
+    "username": "user@gmail.com", 
+    "password": "*********", 
+    "ssl": true,
+    "level": "error"
+    },
+    "EmailServer": {
+    "user": "user@gmail.com",
+    "password": "********",
+    "host": "smtp.gmail.com",
+    "ssl": true
+    },
+    "EmailTest": {
+        "text": "i hope this works",
+        "from": "you <from@gmail.com>",
+        "to": "someone <to@gmail.com>",
+        "subject": "testing emailjs"
+    },
+    "MongoSkinConnection": "localhost:27017/MongoTest?auto_reconnect"
+}
