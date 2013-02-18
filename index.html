@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Node.js-basic-stack by petecleary</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Node.js-basic-stack</h1>
+          <h2></h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/petecleary/node.js-basic-stack/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/petecleary/node.js-basic-stack/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/petecleary/node.js-basic-stack" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>A basic Node.js stack</h1>
+
+<p>This stack is for starting a basic node.js site.  It is built and tested on Windows using IISNode but could equally be used as a standalone node site. </p>
+
+<h2>What's in it?</h2>
+
+<ul>
+<li>Web Framework</li>
+<li>Configuration</li>
+<li>Logging</li>
+<li>Email</li>
+<li>Data storage</li>
+</ul><p><strong>Web Framework with Express</strong></p>
+
+<ul>
+<li><a href="https://github.com/visionmedia/express">Express</a></li>
+<li><a href="http://expressjs.com">http://expressjs.com</a></li>
+</ul><p>I am using Vision Media's Express framework to deliver the test results to a browser.  </p>
+
+<p>This is a basic stack and does not use Jade or any other templating system to return content.  You can add in any templating framework and build on this base stack.</p>
+
+<p><strong>Configuration</strong></p>
+
+<ul>
+<li><a href="https://github.com/flatiron/nconf">nConf</a></li>
+</ul><p>nConf is Flatiron's configuration module.  I am calling the config.json file in the root of the site to get settings for the logging, email and mongo tests.</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">nconf</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'nconf'</span><span class="p">);</span>
+<span class="nx">nconf</span><span class="p">.</span><span class="nx">argv</span><span class="p">()</span>
+       <span class="p">.</span><span class="nx">env</span><span class="p">()</span>
+       <span class="p">.</span><span class="nx">file</span><span class="p">({</span> <span class="nx">file</span><span class="o">:</span> <span class="s1">'config.json'</span> <span class="p">});</span>
+</pre></div>
+
+<p><em>Note: Before running the stack locally you must reset the values in the config.json file to contain your own email and mongo settings.</em></p>
+
+<p><strong>Logging</strong></p>
+
+<ul>
+<li>
+<a href="https://github.com/flatiron/winston">Winston</a> </li>
+</ul><p>Winston is part of the flatiron node.js stack.  I am using two transports, Mongodb and Mail:</p>
+
+<div class="highlight"><pre><span class="c1">//add winston mongo db</span>
+<span class="kd">var</span> <span class="nx">WinstonMongoDb</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'winston-mongodb'</span><span class="p">).</span><span class="nx">MongoDB</span><span class="p">;</span>
+<span class="c1">//add winston mail</span>
+<span class="kd">var</span> <span class="nx">winstonMail</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'winston-mail'</span><span class="p">).</span><span class="nx">Mail</span><span class="p">;</span>
+</pre></div>
+
+<p>The settings for both are managed in the config.json file.</p>
+
+<p>The MongoDb transport is set to warn and error whilst the mail is only used on error. Therefore logging is done to a database and for extream errors to an email address.</p>
+
+<p>I am not using multiple loggers but have set the transports up under a logger so that it can be passed to other files in the application.  You can see this in the tests/email and tests/mongo files.</p>
+
+<p>Testing for the three Winston message types is done on the URL's</p>
+
+<ul>
+<li>/winston for info message test</li>
+<li>/winston/warn for warning message test</li>
+<li>/winson/error for error message test</li>
+</ul><p><strong>Email</strong></p>
+
+<ul>
+<li><a href="https://github.com/eleith/emailjs">Emailjs</a></li>
+</ul><p>I am using the configuration to build both the email server and the test email.</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">email</span><span class="p">.</span><span class="nx">server</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">nconf</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'EmailServer'</span><span class="p">));</span>
+</pre></div>
+
+<div class="highlight"><pre><span class="nx">server</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">nconf</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"EmailTest"</span><span class="p">),</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span> 
+</pre></div>
+
+<p>The logger is also used to log the results.</p>
+
+<p><strong>Data Storage</strong></p>
+
+<ul>
+<li><a href="http://www.mongodb.org/">MongoDb</a></li>
+<li><a href="https://github.com/mongodb/node-mongodb-native">Native MongoDb</a></li>
+<li><a href="https://github.com/kissjs/node-mongoskin">Mongoskin</a></li>
+</ul><p>If you don't know what Mongo DB is then you will need to go and find out at <a href="http://www.mongodb.org/">MongoDb</a>, install the database and get it up and running.  I am also using the free version of <a href="http://www.mongovue.com/">MongoVUE</a> to read the collections and documents.</p>
+
+<p>The tests/mongo file contains a small test to add a document to a collection using Mongoskin and read the first item in a collection.  I am using the configuration to store the connection string.</p>
+
+<div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">(</span><span class="s1">'Test'</span><span class="p">).</span><span class="nx">insert</span><span class="p">({</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"Test Name"</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+</pre></div>
+
+<p>The logger is also used to log the results.</p>
+
+<h2>Installing and running</h2>
+
+<p><strong>Prerequisites</strong></p>
+
+<ul>
+<li><a href="http://nodejs.org/">Node.js</a></li>
+<li><a href="http://www.mongodb.org/">MongoDb</a></li>
+</ul><p><strong>Optional</strong></p>
+
+<ul>
+<li><a href="https://github.com/tjanczuk/iisnode/">IISnode</a></li>
+<li><a href="http://www.microsoft.com/web/webmatrix">WebMatrix</a></li>
+<li><a href="http://go.microsoft.com/?linkid=9784329">IIS Express 7.x</a></li>
+</ul><p><strong>Running Steps</strong></p>
+
+<ul>
+<li>Setup GMail account to send mails to and from</li>
+<li>Update config.json with your details</li>
+<li>Start Mongo</li>
+<li>Open Folder in Webmatrix</li>
+<li>Run and test</li>
+</ul><p><em>Note: you can use /api.js/debug to debug the application in Chrome or any other webkit browser.  Remember to use ?kill to stop debugging, see <a href="https://github.com/tjanczuk/iisnode/">IISnode</a> for more details on debuging.</em></p>
+
+<hr><p>Enjoy, Pete.</p>
+        </section>
+
+        <footer>
+          Node.js-basic-stack is maintained by <a href="https://github.com/petecleary">petecleary</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
